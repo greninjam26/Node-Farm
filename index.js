@@ -1,5 +1,11 @@
 // file system modules
 const fs = require("fs");
+// webserver
+const http = require("http");
+
+////////////////////////////////////////////////////
+// Files
+////////////////////////////////////////////////////
 
 // Blocking
 // read from files
@@ -30,3 +36,19 @@ fs.readFile("./txt/start.txt", "utf-8", (err, data1) => {
 	console.log("Still Reading...");
 });
 console.log("Reading...");
+
+////////////////////////////////////////////////////
+// Server
+////////////////////////////////////////////////////
+
+// req: request
+// res: response
+const server = http.createServer((req, res) => {
+	// console.log(req);
+	res.end("Hello from the server");
+});
+
+// port, host(default localhost address), callback function(optional)
+server.listen(8000, "127.0.0.1", () => {
+	console.log("Listening to requests on port 8000");
+});
