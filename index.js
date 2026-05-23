@@ -5,40 +5,6 @@ const http = require("http");
 const url = require("url");
 
 ////////////////////////////////////////////////////
-// Files
-////////////////////////////////////////////////////
-
-// Blocking
-// read from files
-const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
-console.log(textIn);
-
-// write to files
-const textOut = `This is what we know about hte avocado: ${textIn}.\nCreated on ${Date.now()}`;
-fs.writeFileSync("./txt/output.txt", textOut);
-console.log("File written!");
-
-// Non-Blocking
-fs.readFile("./txt/start.txt", "utf-8", (err, data1) => {
-	if (err) return console.log("ERROR!!!");
-
-	fs.readFile(`./txt/${data1}.txt`, "utf-8", (err, data2) => {
-		console.log(data2);
-		fs.readFile("./txt/append.txt", "utf-8", (err, data3) => {
-			console.log(data3);
-
-			// writting
-			fs.writeFile("./txt/final.txt", `${data2}\n${data3}`, "utf-8", error => {
-				console.log("Written");
-			});
-		});
-		console.log("Reading Again...");
-	});
-	console.log("Still Reading...");
-});
-console.log("Reading...");
-
-////////////////////////////////////////////////////
 // Server
 ////////////////////////////////////////////////////
 
@@ -77,7 +43,7 @@ const dataObj = JSON.parse(data);
 // res: response
 // this will be run once at every request
 const server = http.createServer((req, res) => {
-	const pathname = req.url;
+	const { query, pathname } = url.parse(req.url, true);
 
 	// Overview page
 	if (pathname === "/" || pathname === "/overview") {
@@ -91,10 +57,12 @@ const server = http.createServer((req, res) => {
 	// Product page
 	else if (pathname == "/product") {
 		res.writeHead(200, { "content-type": "text/html" });
+		// this works because we assume the id of the element matches the location it is in the data array
+		const product = dataObj[query.id];
+		if (!product) return res.end("<h1>Product not found!</h1>");
+		const output = replaceTemplate(tempProduct, product);
 
-		const productHTML = dataObj.map(el => replaceTemplate(tempProduct, el)).join("");
-
-		res.end(productHTML);
+		res.end(output);
 	}
 	// API
 	else if (pathname == "/api") {
