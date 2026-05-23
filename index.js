@@ -42,6 +42,12 @@ console.log("Reading...");
 // Server
 ////////////////////////////////////////////////////
 
+// we can keep it syncrinsis, blocking the code doesn't matter in this case
+// the top level code is only run once at the start anyway
+// __dirname, will make the path start from the folder the current script is located in
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
+const dataObj = JSON.parse(data);
+
 // req: request
 // res: response
 const server = http.createServer((req, res) => {
@@ -51,6 +57,16 @@ const server = http.createServer((req, res) => {
 		res.end("This is the overview");
 	} else if (pathname == "/product") {
 		res.end("This is the product");
+	} else if (pathname == "/api") {
+		// this is not efficient, because everytime something go to the route, the data is fetched
+		// we should keep the fetching outside and only do it once
+		// fs.readFile(`${__dirname}/dev-data/data.json`, "utf-8", (error, data) => {
+		// 	const productData = JSON.parse(data);
+		// 	res.writeHead(200, { "content-type": "application/json" });
+		// 	res.end(data);
+		// });
+		res.writeHead(200, { "content-type": "application/json" });
+		res.end(data);
 	} else {
 		res.writeHead(404, {
 			"Content-type": "text/html",
